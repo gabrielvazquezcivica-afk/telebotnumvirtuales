@@ -2,7 +2,7 @@ import telebot
 import requests
 
 # 👇 PON AQUÍ TU TOKEN DE @BotFather
-TOKEN = "TU_CODIGO_AQUI"
+TOKEN = "8919850373:AAFNlGF93_QhjuCLaqqwDWMnwL2dQoJmj7s"
 
 bot = telebot.TeleBot(TOKEN)
 
