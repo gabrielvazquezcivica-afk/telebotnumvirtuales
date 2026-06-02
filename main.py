@@ -2,50 +2,52 @@ import telebot
 import requests
 
 # 👇 PON AQUÍ TU TOKEN DE @BotFather
-TOKEN = "8919850373:AAFNlGF93_QhjuCLaqqwDWMnwL2dQoJmj7s"
+TOKEN = "TU_CODIGO_AQUI"
 
 bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start'])
 def inicio(mensaje):
-    bot.reply_to(mensaje, "👋 ¡Hola! Usa /numero para obtener un número virtual gratis 🇺🇸🇪🇸🇲🇽\n⚠️ Son compartidos y temporales, no para cuentas bancarias ni personales.")
+    bot.reply_to(mensaje, "👋 ¡Hola! Usa /numero para obtener un número virtual gratis 🇺🇸🇪🇸🇲🇽\n⚠️ Son compartidos y temporales, no para cuentas importantes.")
 
 @bot.message_handler(commands=['numero'])
 def dar_numero(mensaje):
     try:
-        url = "https://otp-api.shelex.dev/api/list/USA"
-        r = requests.get(url)
+        # 🔴 API NUEVA Y FUNCIONANDO
+        url = "https://smsreceivefree.com/api/country/usa"
+        r = requests.get(url, timeout=10)
         data = r.json()
 
         if not data or len(data) == 0:
-            bot.reply_to(mensaje, "❌ No hay números disponibles ahora, intenta más tarde.")
+            bot.reply_to(mensaje, "❌ No hay números ahora, intenta en 5 min.")
             return
 
-        num = data[0]
-        texto = f"📞 Tu número: +1{num}\n📩 Para ver SMS: /sms {num}"
+        num = data[0]['number']
+        id_num = data[0]['id']
+        texto = f"📞 Tu número: +1{num}\n📩 Para ver SMS: /sms {id_num}"
         bot.reply_to(mensaje, texto)
 
     except Exception as e:
-        bot.reply_to(mensaje, "⚠️ Error al obtener número, intenta luego.")
+        bot.reply_to(mensaje, "⚠️ Error al obtener número, prueba otra vez.")
 
 @bot.message_handler(commands=['sms'])
 def ver_sms(mensaje):
     try:
         partes = mensaje.text.split()
         if len(partes) < 2:
-            bot.reply_to(mensaje, "❗ Escribe: /sms 1234567890")
+            bot.reply_to(mensaje, "❗ Escribe: /sms ID_DEL_NUMERO")
             return
 
-        num = partes[1]
-        url = f"https://otp-api.shelex.dev/api/USA/{num}"
-        r = requests.get(url)
+        id_num = partes[1]
+        url = f"https://smsreceivefree.com/api/sms/{id_num}"
+        r = requests.get(url, timeout=10)
         sms = r.json()
 
         if not sms or len(sms) == 0:
-            bot.reply_to(mensaje, "📭 Aún no hay mensajes, espera 1-2 min y prueba otra vez.")
+            bot.reply_to(mensaje, "📭 Aún no hay mensajes, espera 1-2 min.")
             return
 
-        texto = "📨 Mensajes recibidos:\n"
+        texto = "📨 Mensajes:\n"
         for m in sms[:5]:
             texto += f"🕒 {m['time']} | De: {m['from']}\n📄 {m['text']}\n---\n"
 
@@ -56,4 +58,3 @@ def ver_sms(mensaje):
 
 print("✅ Bot funcionando...")
 bot.polling()
-                          
